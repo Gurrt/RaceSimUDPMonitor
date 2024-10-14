@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -350,15 +351,15 @@ namespace Ams2SharedMemoryWatcher
         public float mWorldFastestSector3Time;                   // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
 
         // Flags
-        public UInt32 mHighestFlagColour;                 // [ enum (Type#5) Flag Colour ]
-        public UInt32 mHighestFlagReason;                 // [ enum (Type#6) Flag Reason ]
+        public FlagColours mHighestFlagColour;                 // [ enum (Type#5) Flag Colour ]
+        public FlagReason mHighestFlagReason;                 // [ enum (Type#6) Flag Reason ]
 
         // Pit Info
-        public UInt32 mPitMode;                           // [ enum (Type#7) Pit Mode ]
-        public UInt32 mPitSchedule;                       // [ enum (Type#8) Pit Stop Schedule ]
+        public PitMode mPitMode;                           // [ enum (Type#7) Pit Mode ]
+        public PitSchedule mPitSchedule;                       // [ enum (Type#8) Pit Stop Schedule ]
 
         // Car State
-        public UInt32 mCarFlags;                          // [ enum (Type#9) Car Flags ]
+        public CarFlags mCarFlags;                          // [ enum (Type#9) Car Flags ]
         public float mOilTempCelsius;                           // [ UNITS = Celsius ]   [ UNSET = 0.0f ]
         public float mOilPressureKPa;                           // [ UNITS = Kilopascal ]   [ RANGE = 0.0f->... ]   [ UNSET = 0.0f ]
         public float mWaterTempCelsius;                         // [ UNITS = Celsius ]   [ UNSET = 0.0f ]
@@ -392,8 +393,8 @@ namespace Ams2SharedMemoryWatcher
         public float[] mExtentsCentre = new float[(int)Vector.VEC_MAX];                    // [ UNITS = Local Space  X  Y  Z ]
 
         // Wheels / Tyres
-        public UInt32[] mTyreFlags = new UInt32[(int)Tyres.TYRE_MAX];               // [ enum (Type#10) Tyre Flags ]
-        public UInt32[] mTerrain = new UInt32[(int)Tyres.TYRE_MAX];                 // [ enum (Type#11) Terrain Materials ]
+        public TyreFlags[] mTyreFlags = new TyreFlags[(int)Tyres.TYRE_MAX];               // [ enum (Type#10) Tyre Flags ]
+        public TerrainMaterials[] mTerrain = new TerrainMaterials[(int)Tyres.TYRE_MAX];                 // [ enum (Type#11) Terrain Materials ]
         public float[] mTyreY = new float[(int)Tyres.TYRE_MAX];                          // [ UNITS = Local Space  Y ]
         public float[] mTyreRPS = new float[(int)Tyres.TYRE_MAX];                        // [ UNITS = Revolutions per second ]
         public float[] mTyreSlipSpeed = new float[(int)Tyres.TYRE_MAX];                  // OBSOLETE, kept for backward compatibility only
@@ -409,10 +410,10 @@ namespace Ams2SharedMemoryWatcher
         public float[] mTyreLayerTemp = new float[(int)Tyres.TYRE_MAX];                  // [ UNITS = Kelvin ]
         public float[] mTyreCarcassTemp = new float[(int)Tyres.TYRE_MAX];                // [ UNITS = Kelvin ]
         public float[] mTyreRimTemp = new float[(int)Tyres.TYRE_MAX];                    // [ UNITS = Kelvin ]
-        public float[] mTyrepublicAirTemp = new float[(int)Tyres.TYRE_MAX];            // [ UNITS = Kelvin ]
+        public float[] mTyreInternalAirTemp = new float[(int)Tyres.TYRE_MAX];            // [ UNITS = Kelvin ]
 
         // Car Damage
-        public UInt32 mCrashState;                        // [ enum (Type#12) Crash Damage State ]
+        public CrashDamage mCrashState;                        // [ enum (Type#12) Crash Damage State ]
         public float mAeroDamage;                               // [ RANGE = 0.0f->1.0f ]
         public float mEngineDamage;                             // [ RANGE = 0.0f->1.0f ]
 
@@ -449,8 +450,8 @@ namespace Ams2SharedMemoryWatcher
         public float[] mFastestLapTimes = new float[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];            // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public float[] mLastLapTimes = new float[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];               // [ UNITS = seconds ]   [ RANGE = 0.0f->... ]   [ UNSET = -1.0f ]
         public bool[] mLapsInvalidated = new bool[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];            // [ UNITS = boolean for all participants ]   [ RANGE = false->true ]   [ UNSET = false ]
-        public UInt32[] mRaceStates = new UInt32[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];         // [ enum (Type#3) Race State ]
-        public UInt32[] mPitModes = new UInt32[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];           // [ enum (Type#7)  Pit Mode ]
+        public RaceState[] mRaceStates = new RaceState[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];         // [ enum (Type#3) Race State ]
+        public PitMode[] mPitModes = new PitMode[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];           // [ enum (Type#7)  Pit Mode ]
         public float[,] mOrientations = new float[SharedMemoryConsts.STORED_PARTICIPANTS_MAX, (int)Vector.VEC_MAX];      // [ UNITS = Euler Angles ]
 	    public float[] mSpeeds = new float[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];                     // [ UNITS = Metres per-second ]   [ RANGE = 0.0f->... ]
         public char[,] mCarNames = new char[SharedMemoryConsts.STORED_PARTICIPANTS_MAX, SharedMemoryConsts.STRING_LENGTH_MAX]; // [ string ]
@@ -462,10 +463,10 @@ namespace Ams2SharedMemoryWatcher
         public char[] mTranslatedTrackVariation = new char[SharedMemoryConsts.STRING_LENGTH_MAX]; // [ string ]
         public float mBrakeBias;                                                                       // [ RANGE = 0.0f->1.0f... ]   [ UNSET = -1.0f ]
         public float mTurboBoostPressure;                                                  //	 RANGE = 0.0f->1.0f... ]   [ UNSET = -1.0f ]
-        public char[,] mTyreCompound= new char[(int)Tyres.TYRE_MAX, SharedMemoryConsts.TYRE_COMPOUND_NAME_LENGTH_MAX];// [ strings  ]
-	    public UInt32[] mPitSchedules = new UInt32[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];  // [ enum (Type#7)  Pit Mode ]
-        public UInt32[] mHighestFlagColours = new UInt32[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];                 // [ enum (Type#5) Flag Colour ]
-        public UInt32[] mHighestFlagReasons = new UInt32[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];                 // [ enum (Type#6) Flag Reason ]
+        public string[] mTyreCompound= new string[(int)Tyres.TYRE_MAX];// [ strings  ]
+	    public PitMode[] mPitSchedules = new PitMode[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];  // [ enum (Type#7)  Pit Mode ]
+        public FlagColours[] mHighestFlagColours = new FlagColours[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];                 // [ enum (Type#5) Flag Colour ]
+        public FlagReason[] mHighestFlagReasons = new FlagReason[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];                 // [ enum (Type#6) Flag Reason ]
         public UInt32[] mNationalities = new UInt32[SharedMemoryConsts.STORED_PARTICIPANTS_MAX];                                         // [ nationality table , SP AND UNSET = 0 ]
         public float mSnowDensity;                                                             // [ UNITS = How much snow will fall ]   [ RANGE = 0.0f->1.0f ], this is non zero only in Winter and Snow seasons
 
@@ -503,13 +504,15 @@ namespace Ams2SharedMemoryWatcher
         public bool mClutchOverheated;          // true if clutch performance is degraded due to overheating
         public bool mClutchSlipping;            // true if clutch is slipping (can be induced by overheating or wear)
 
-        public int mYellowFlagState;             // [ enum (Type#16) YellowFlagState ]
+        public YellowFlagState mYellowFlagState;             // [ enum (Type#16) YellowFlagState ]
 
         public bool mSessionIsPrivate;           // true if this is a private session where users cannot see or interact with other drivers (and so would not need positional awareness of them etc)
-        public int mLaunchStage;                 // [ enum (Type#17) LaunchStage
+        public LaunchStage mLaunchStage;                 // [ enum (Type#17) LaunchStage
 
         public SharedMemory(BinaryReader br)
         {
+            byte[] all = br.ReadBytes(20000);
+            br.BaseStream.Position = 0;
             mVersion = br.ReadUInt32();
             mBuildVersionNumber = br.ReadUInt32();
             mGameState = (GameState)br.ReadUInt32();
@@ -535,6 +538,346 @@ namespace Ams2SharedMemoryWatcher
             mTrackLocation = br.ReadChars(SharedMemoryConsts.STRING_LENGTH_MAX);
             mTrackVariation = br.ReadChars(SharedMemoryConsts.STRING_LENGTH_MAX);
             mTrackLength = br.ReadSingle();
+
+            mNumSectors = br.ReadInt32();
+            mLapInvalidated = br.ReadBoolean();
+            br.ReadBytes(3); // 3 Empty bytes for alignment reasons.
+            // Last working value above?
+            mBestLapTime = br.ReadSingle();
+            mLastLapTime = br.ReadSingle();
+            mCurrentTime = br.ReadSingle();
+            mSplitTimeAhead = br.ReadSingle();
+            mSplitTimeBehind = br.ReadSingle();
+            mSplitTime = br.ReadSingle();
+            mEventTimeRemaining = br.ReadSingle();
+            mPersonalFastestLapTime = br.ReadSingle();
+            mWorldFastestLapTime = br.ReadSingle();
+            mCurrentSector1Time = br.ReadSingle();
+            mCurrentSector2Time = br.ReadSingle();
+            mCurrentSector3Time = br.ReadSingle();
+            mFastestSector1Time = br.ReadSingle();
+            mFastestSector2Time = br.ReadSingle();
+            mFastestSector3Time = br.ReadSingle();
+            mPersonalFastestSector1Time = br.ReadSingle();
+            mPersonalFastestSector2Time = br.ReadSingle();
+            mPersonalFastestSector3Time = br.ReadSingle();
+            mWorldFastestSector1Time = br.ReadSingle();
+            mWorldFastestSector2Time = br.ReadSingle();
+            mWorldFastestSector3Time = br.ReadSingle();
+            mHighestFlagColour = (FlagColours)br.ReadUInt32();
+            mHighestFlagReason = (FlagReason)br.ReadUInt32();
+
+            mPitMode = (PitMode)br.ReadUInt32();
+            mPitSchedule = (PitSchedule)br.ReadUInt32();
+
+            mCarFlags = (CarFlags)br.ReadUInt32();
+            mOilTempCelsius = br.ReadSingle();
+            mOilPressureKPa = br.ReadSingle();
+            mWaterTempCelsius = br.ReadSingle();
+            mWaterPressureKPa = br.ReadSingle();
+            mFuelPressureKPa = br.ReadSingle();
+            mFuelLevel = br.ReadSingle();
+            mFuelCapacity = br.ReadSingle();
+            mSpeed = br.ReadSingle();
+            mRpm = br.ReadSingle();
+            mMaxRPM = br.ReadSingle();
+            mBrake = br.ReadSingle();
+            mThrottle = br.ReadSingle();
+            mClutch = br.ReadSingle();
+            mSteering = br.ReadSingle();
+            mGear = br.ReadInt32();
+            mNumGears = br.ReadInt32();
+            mOdometerKM = br.ReadSingle();
+            mAntiLockActive = br.ReadBoolean();
+            br.ReadBytes(3);
+            // Last working?
+            mLastOpponentCollisionIndex = br.ReadInt32();
+            mLastOpponentCollisionMagnitude = br.ReadSingle();
+            mBoostActive = br.ReadBoolean();
+            br.ReadBytes(3);
+            mBoostAmount = br.ReadSingle();
+
+            for (int i = 0; i < (int)Vector.VEC_MAX; i++)
+            {
+                mOrientation[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Vector.VEC_MAX; i++)
+            {
+                mLocalVelocity[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Vector.VEC_MAX; i++)
+            {
+                mWorldVelocity[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Vector.VEC_MAX; i++)
+            {
+                mAngularVelocity[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Vector.VEC_MAX; i++)
+            {
+                mLocalAcceleration[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Vector.VEC_MAX; i++)
+            {
+                mWorldAcceleration[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Vector.VEC_MAX; i++)
+            {
+                mExtentsCentre[i] = br.ReadSingle();
+            }
+
+            for (int i = 0; i <(int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreFlags[i] = (TyreFlags)br.ReadUInt32();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTerrain[i] = (TerrainMaterials)br.ReadUInt32();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreY[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreRPS[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreSlipSpeed[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreTemp[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreGrip[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreHeightAboveGround[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreLateralStiffness[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreWear[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mBrakeDamage[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mSuspensionDamage[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mBrakeTempCelsius[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreTreadTemp[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreLayerTemp[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreCarcassTemp[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreRimTemp[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreInternalAirTemp[i] = br.ReadSingle();
+            }
+
+            mCrashState = (CrashDamage)br.ReadUInt32();
+            mAeroDamage = br.ReadSingle();
+            mEngineDamage = br.ReadSingle();
+
+            mAmbientTemperature = br.ReadSingle();
+            mTrackTemperature = br.ReadSingle();
+            mRainDensity = br.ReadSingle();
+            mWindSpeed = br.ReadSingle();
+            mWindDirectionX = br.ReadSingle();
+            mWindDirectionY = br.ReadSingle();
+            mCloudBrightness = br.ReadSingle();
+
+            mSequenceNumber = br.ReadUInt32();
+
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mWheelLocalPositionY[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mSuspensionTravel[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mSuspensionVelocity[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mAirPressure[i] = br.ReadSingle();
+            }
+            mEngineSpeed = br.ReadSingle();
+            mEngineTorque = br.ReadSingle();
+            mWings[0] = br.ReadSingle();
+            mWings[1] = br.ReadSingle();
+            mHandBrake = br.ReadSingle();
+
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mCurrentSector1Times[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mCurrentSector2Times[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mCurrentSector3Times[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mFastestSector1Times[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mFastestSector2Times[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mFastestSector3Times[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mFastestLapTimes[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mLastLapTimes[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mLapsInvalidated[i] = br.ReadBoolean();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mRaceStates[i] = (RaceState)br.ReadUInt32();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mPitModes[i] = (PitMode)br.ReadUInt32();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                for (int j = 0; j < (int)Vector.VEC_MAX; j++)
+                {
+                    mOrientations[i,j] = br.ReadSingle();
+                }
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mSpeeds[i] = br.ReadSingle();
+            }
+            // TODO: Refactor these to not be char by char
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                for (int j = 0; j < SharedMemoryConsts.STRING_LENGTH_MAX; j++)
+                {
+                    mCarNames[i, j] = br.ReadChar();
+                }
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                for (int j = 0; j < SharedMemoryConsts.STRING_LENGTH_MAX; j++)
+                {
+                    mCarClassNames[i, j] = br.ReadChar();
+                }
+            }
+
+            mEnforcedPitStopLap = br.ReadInt32();
+            mTranslatedTrackLocation = br.ReadChars(SharedMemoryConsts.STRING_LENGTH_MAX);
+            mTranslatedTrackVariation = br.ReadChars(SharedMemoryConsts.STRING_LENGTH_MAX);
+            mBrakeBias = br.ReadSingle();
+            mTurboBoostPressure = br.ReadSingle();
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreCompound[i] = new String(br.ReadChars(SharedMemoryConsts.TYRE_COMPOUND_NAME_LENGTH_MAX));
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mPitSchedules[i] = (PitMode)br.ReadInt32();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mHighestFlagColours[i] = (FlagColours)br.ReadInt32();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mHighestFlagReasons[i] = (FlagReason)br.ReadInt32();
+            }
+            for (int i = 0; i < SharedMemoryConsts.STORED_PARTICIPANTS_MAX; i++)
+            {
+                mNationalities[i] = br.ReadUInt32();
+            }
+            mSnowDensity = br.ReadSingle();
+
+            mSessionDuration = br.ReadSingle();
+            mSessionAdditionalLaps = br.ReadInt32();
+
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreTempLeft[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreTempCenter[i] = br.ReadSingle();
+            }
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mTyreTempRight[i] = br.ReadSingle();
+            }
+
+            mDrsState = br.ReadUInt32();
+
+            for (int i = 0; i < (int)Tyres.TYRE_MAX; i++)
+            {
+                mRideHeight[i] = br.ReadSingle();
+            }
+
+            mJoyPad0 = br.ReadUInt32();
+            mDPad = br.ReadUInt32();
+
+            mAntiLockSetting = br.ReadInt32();
+            mTractionControlSetting = br.ReadInt32();
+
+            mErsDeploymentMode = br.ReadInt32();
+            mErsAutoModeEnabled = br.ReadBoolean();
+            br.ReadBytes(3);
+
+            mClutchTemp = br.ReadSingle();
+            mClutchWear = br.ReadSingle();
+            mClutchOverheated = br.ReadBoolean();
+            br.ReadBytes(3);
+            mClutchSlipping = br.ReadBoolean();
+            br.ReadBytes(3);
+
+            mYellowFlagState = (YellowFlagState)br.ReadInt32();
+
+            mSessionIsPrivate = br.ReadBoolean();
+            mLaunchStage = (LaunchStage)br.ReadInt32();
+
         }
     }
 }
