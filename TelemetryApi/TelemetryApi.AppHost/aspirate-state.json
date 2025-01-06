@@ -1,0 +1,23 @@
+{
+  "projectPath": ".",
+  "outputPath": "aspirate-output",
+  "namespace": "racesim",
+  "containerRegistry": "docker.io",
+  "containerImageTags": [
+    "latest"
+  ],
+  "imagePullPolicy": "IfNotPresent",
+  "containerBuilder": "docker",
+  "containerRepositoryPrefix": "gurrtpersonal",
+  "outputFormat": "compose",
+  "skipFinalKustomizeGeneration": true,
+  "privateRegistryEmail": "aspir8@aka.ms",
+  "includeDashboard": true,
+  "useCustomNamespace": true,
+  "secrets": {
+    "salt": "SoF4GpAmt\u002B\u002BS5E74",
+    "hash": "NJzqYncE7v/KCATV\u002BH\u002BSwAf8Eu2ryTp2OCQyCVNkeFQ=",
+    "secrets": {}
+  },
+  "processAllComponents": true
+}

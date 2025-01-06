@@ -5,7 +5,19 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceSimUDPMonitor", "RaceSimUDPMonitor\RaceSimUDPMonitor.csproj", "{CAC762F6-E679-473E-A588-774D2861CC08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ams2SharedMemoryWatcher", "Ams2SharedMemoryWatcher\Ams2SharedMemoryWatcher.csproj", "{F251F74A-FC80-47D8-AE41-063E82307F39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ams2SharedMemoryWatcher", "Ams2SharedMemoryWatcher\Ams2SharedMemoryWatcher.csproj", "{F251F74A-FC80-47D8-AE41-063E82307F39}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ams2SharedComponents", "Ams2SharedComponents\Ams2SharedComponents.csproj", "{C85EEE07-3822-4985-A8CF-7B9B08315D9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetryApi.AppHost", "TelemetryApi\TelemetryApi.AppHost\TelemetryApi.AppHost.csproj", "{3BC6CD5C-396D-422E-A5D3-9EA09BE214F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelemetryApi.ServiceDefaults", "TelemetryApi\TelemetryApi.ServiceDefaults\TelemetryApi.ServiceDefaults.csproj", "{05240952-9930-4D91-8FF4-B7AC1F208382}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelemetryApi.ApiService", "TelemetryApi\TelemetryApi.ApiService\TelemetryApi.ApiService.csproj", "{75ACC48D-8FDF-40B5-A708-B056D599406A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelemetryApi.Web", "TelemetryApi\TelemetryApi.Web\TelemetryApi.Web.csproj", "{0F512901-1075-4F05-B3B1-A9E5B6309700}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelemetryApi.Tests", "TelemetryApi\TelemetryApi.Tests\TelemetryApi.Tests.csproj", "{D729B219-00E3-4CB6-8225-190622547956}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +33,30 @@ Global
 		{F251F74A-FC80-47D8-AE41-063E82307F39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F251F74A-FC80-47D8-AE41-063E82307F39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F251F74A-FC80-47D8-AE41-063E82307F39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C85EEE07-3822-4985-A8CF-7B9B08315D9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C85EEE07-3822-4985-A8CF-7B9B08315D9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C85EEE07-3822-4985-A8CF-7B9B08315D9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C85EEE07-3822-4985-A8CF-7B9B08315D9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BC6CD5C-396D-422E-A5D3-9EA09BE214F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BC6CD5C-396D-422E-A5D3-9EA09BE214F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BC6CD5C-396D-422E-A5D3-9EA09BE214F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BC6CD5C-396D-422E-A5D3-9EA09BE214F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05240952-9930-4D91-8FF4-B7AC1F208382}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05240952-9930-4D91-8FF4-B7AC1F208382}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05240952-9930-4D91-8FF4-B7AC1F208382}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05240952-9930-4D91-8FF4-B7AC1F208382}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75ACC48D-8FDF-40B5-A708-B056D599406A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75ACC48D-8FDF-40B5-A708-B056D599406A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75ACC48D-8FDF-40B5-A708-B056D599406A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75ACC48D-8FDF-40B5-A708-B056D599406A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F512901-1075-4F05-B3B1-A9E5B6309700}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F512901-1075-4F05-B3B1-A9E5B6309700}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F512901-1075-4F05-B3B1-A9E5B6309700}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F512901-1075-4F05-B3B1-A9E5B6309700}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D729B219-00E3-4CB6-8225-190622547956}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D729B219-00E3-4CB6-8225-190622547956}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D729B219-00E3-4CB6-8225-190622547956}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D729B219-00E3-4CB6-8225-190622547956}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

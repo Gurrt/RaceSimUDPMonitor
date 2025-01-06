@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "YQj17roaYVc=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\gerri\\Documents\\RaceSimProject\\RaceSimUDPMonitor\\Ams2SharedComponents\\Ams2SharedComponents.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\gerri\\.nuget\\packages\\messagepack\\3.1.1\\messagepack.3.1.1.nupkg.sha512",
+    "C:\\Users\\gerri\\.nuget\\packages\\messagepack.annotations\\3.1.1\\messagepack.annotations.3.1.1.nupkg.sha512",
+    "C:\\Users\\gerri\\.nuget\\packages\\messagepackanalyzer\\3.1.1\\messagepackanalyzer.3.1.1.nupkg.sha512",
+    "C:\\Users\\gerri\\.nuget\\packages\\microsoft.net.stringtools\\17.11.4\\microsoft.net.stringtools.17.11.4.nupkg.sha512"
+  ],
+  "logs": []
+}
