@@ -1,9 +1,9 @@
 using Ams2SharedComponents;
 using MessagePack;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using System.Diagnostics;
-using TelemetryApi.ApiService.Database;
+using TelemetryApi.Data.Contexts;
+using TelemetryApi.Data.DTO;
+using TelemetryApi.Data.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +26,8 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
+float lastKnownLaptime = float.MaxValue;
+
 app.MapGet("/weatherforecast", () =>
 {
     var forecast = Enumerable.Range(1, 5).Select(index =>
@@ -42,17 +44,38 @@ app.MapGet("/weatherforecast", () =>
 app.MapPost("/telemetry", async([FromBody]Stream data) =>
 {
     SharedMemory rcd = await MessagePackSerializer.DeserializeAsync<SharedMemory>(data);
-    allMemories.Add(rcd);
-    if (++cntr % 100 == 0)
+    if (rcd.mLastLapTime != lastKnownLaptime)
     {
-        cntr = 0;
-        Console.WriteLine($"[{DateTime.Now.ToString()}] Current Speed: {rcd.mSpeed} m/s.");
+        lastKnownLaptime = rcd.mLastLapTime;
+        int minutes = (int) Math.Floor(lastKnownLaptime / 60);
+        int seconds = (int)Math.Floor(lastKnownLaptime % 60);
+        int miliseconds = (int)(1000 * (lastKnownLaptime - Math.Floor(lastKnownLaptime)));
+
+        string secondsString = seconds < 10 ? "0" + seconds : seconds.ToString();
+        string milisecondsString = miliseconds < 10 ? "00" + miliseconds :
+            miliseconds < 100 ? "0" + miliseconds :
+            miliseconds.ToString();
+
+        string laptimeString = $"{minutes}:{secondsString}.{milisecondsString}";
+
+        Console.WriteLine($"New lap from driver: ${laptimeString}");
     }
+    allMemories.Add(rcd);
+});
+
+app.MapGet("/simulators", (RacesimDbContext context) =>
+{
+    return context.Simulators.Select(sim => new SimulatorDTO(sim.FriendlyName, sim.NumSessions, false)).ToArray();
 });
 
 app.MapDefaultEndpoints();
 
 app.Run();
+
+record SimulatorRecord(string Name, int numSessions)
+{
+
+}
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {

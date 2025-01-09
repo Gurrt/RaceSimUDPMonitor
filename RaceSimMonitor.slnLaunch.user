@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Ams2SharedMemoryWatcher\\Ams2SharedMemoryWatcher.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "TelemetryApi\\TelemetryApi.AppHost\\TelemetryApi.AppHost.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

@@ -1,0 +1,45 @@
+﻿@page "/simulators"
+@attribute [StreamRendering(true)]
+@attribute [OutputCache(Duration = 5)]
+
+@inject SimulatorApiClient SimulatorApi
+
+<PageTitle>Simulators</PageTitle>
+
+<h1>Simulators</h1>
+
+@if (simulators == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Sessions</th>
+                <th>Active</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sim in simulators)
+            {
+                <tr>
+                    <td>@sim.FriendlyName</td>
+                    <td>@sim.NumSessions</td>
+                    <td>@sim.Connected</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private SimulatorDTO[]? simulators;
+
+    protected override async Task OnInitializedAsync()
+    {
+        simulators = await SimulatorApi.GetSimulators();
+    }
+}

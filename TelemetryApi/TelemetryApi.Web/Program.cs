@@ -1,7 +1,11 @@
 using TelemetryApi.Web;
 using TelemetryApi.Web.Components;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using TelemetryApi.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<TelemetryApiWebContext>(options => options.UseNpgsql("postgresdb"));
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
@@ -12,12 +16,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddOutputCache();
 
-builder.Services.AddHttpClient<WeatherApiClient>(client =>
-    {
-        // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-        // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https+http://apiservice");
-    });
+builder.Services.AddHttpClient<WeatherApiClient>(ConfigureHttpClient);
+builder.Services.AddHttpClient<SimulatorApiClient>(ConfigureHttpClient);
 
 var app = builder.Build();
 
@@ -41,3 +41,8 @@ app.MapRazorComponents<App>()
 app.MapDefaultEndpoints();
 
 app.Run();
+
+static void ConfigureHttpClient(HttpClient client)
+{
+    client.BaseAddress = new("https+http://apiservice");
+}

@@ -717,7 +717,6 @@ namespace Ams2SharedComponents
             mNumSectors = br.ReadInt32();
             mLapInvalidated = br.ReadBoolean();
             br.ReadBytes(3); // 3 Empty bytes for alignment reasons.
-            // Last working value above?
             mBestLapTime = br.ReadSingle();
             mLastLapTime = br.ReadSingle();
             mCurrentTime = br.ReadSingle();
