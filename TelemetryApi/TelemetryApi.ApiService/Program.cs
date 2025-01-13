@@ -1,6 +1,8 @@
 using Ams2SharedComponents;
 using MessagePack;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using TelemetryApi.ApiService.Hubs;
 using TelemetryApi.Data.Contexts;
 using TelemetryApi.Data.DTO;
 using TelemetryApi.Data.Models;
@@ -13,6 +15,17 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddProblemDetails();
 builder.AddNpgsqlDbContext<RacesimDbContext>("postgresdb");
+
+builder.Services.AddSignalR();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("*");
+        policy.WithHeaders(["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Signalr-User-Agent"]);
+    });
+});
 
 var app = builder.Build();
 int cntr = 0;
@@ -41,9 +54,10 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 });
 
-app.MapPost("/telemetry", async([FromBody]Stream data) =>
+app.MapPost("/telemetry", async([FromBody]Stream data, IHubContext<RealtimeTelemetryHub> hub) =>
 {
     SharedMemory rcd = await MessagePackSerializer.DeserializeAsync<SharedMemory>(data);
+    allMemories.Add(rcd);
     if (rcd.mLastLapTime != lastKnownLaptime)
     {
         lastKnownLaptime = rcd.mLastLapTime;
@@ -57,10 +71,10 @@ app.MapPost("/telemetry", async([FromBody]Stream data) =>
             miliseconds.ToString();
 
         string laptimeString = $"{minutes}:{secondsString}.{milisecondsString}";
-
-        Console.WriteLine($"New lap from driver: ${laptimeString}");
+        string loggingString = $"New lap from driver: {laptimeString}";
+        Console.WriteLine(loggingString);
+        hub.Clients.All.SendAsync("ReceiveMessage", "Race Control", loggingString);
     }
-    allMemories.Add(rcd);
 });
 
 app.MapGet("/simulators", (RacesimDbContext context) =>
@@ -68,7 +82,11 @@ app.MapGet("/simulators", (RacesimDbContext context) =>
     return context.Simulators.Select(sim => new SimulatorDTO(sim.FriendlyName, sim.NumSessions, false)).ToArray();
 });
 
+app.MapHub<RealtimeTelemetryHub>("/realtimeTelemetryHub");
+
 app.MapDefaultEndpoints();
+
+app.UseCors();
 
 app.Run();
 

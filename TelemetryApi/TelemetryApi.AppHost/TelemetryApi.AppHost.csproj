@@ -10,7 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\TelemetryApi.ApiService\TelemetryApi.ApiService.csproj" />
+    <ProjectReference Include="..\TelemetryApi.SignalRHub\TelemetryApi.SignalRHub.csproj" />
     <ProjectReference Include="..\TelemetryApi.Web\TelemetryApi.Web.csproj" />
+    <ProjectReference Include="..\WebAssemblyComponents\WebAssemblyComponents\WebAssemblyComponents.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.0.0" />

@@ -23,6 +23,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetryApi.Data", "Teleme
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetryApi.DbMigrationService", "TelemetryApi\TelemetryApi.DbMigrationService\TelemetryApi.DbMigrationService.csproj", "{17E0B31C-E96C-41D9-9EF9-A67F772C02A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetryApi.SignalRHub", "TelemetryApi\TelemetryApi.SignalRHub\TelemetryApi.SignalRHub.csproj", "{F3CDC506-DCE7-406A-B2AD-A6FE5969DF68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAssemblyComponents", "TelemetryApi\WebAssemblyComponents\WebAssemblyComponents\WebAssemblyComponents.csproj", "{F7097447-33EB-49AB-B0E2-908A2750A8EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAssemblyComponents.Client", "TelemetryApi\WebAssemblyComponents\WebAssemblyComponents.Client\WebAssemblyComponents.Client.csproj", "{00C2A290-6234-4EA4-BBC5-55EDCD9F07C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +75,18 @@ Global
 		{17E0B31C-E96C-41D9-9EF9-A67F772C02A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17E0B31C-E96C-41D9-9EF9-A67F772C02A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17E0B31C-E96C-41D9-9EF9-A67F772C02A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3CDC506-DCE7-406A-B2AD-A6FE5969DF68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3CDC506-DCE7-406A-B2AD-A6FE5969DF68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3CDC506-DCE7-406A-B2AD-A6FE5969DF68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3CDC506-DCE7-406A-B2AD-A6FE5969DF68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7097447-33EB-49AB-B0E2-908A2750A8EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7097447-33EB-49AB-B0E2-908A2750A8EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7097447-33EB-49AB-B0E2-908A2750A8EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7097447-33EB-49AB-B0E2-908A2750A8EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00C2A290-6234-4EA4-BBC5-55EDCD9F07C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00C2A290-6234-4EA4-BBC5-55EDCD9F07C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00C2A290-6234-4EA4-BBC5-55EDCD9F07C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00C2A290-6234-4EA4-BBC5-55EDCD9F07C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

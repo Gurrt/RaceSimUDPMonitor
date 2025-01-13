@@ -12,12 +12,15 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents()
+    .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddOutputCache();
 
 builder.Services.AddHttpClient<WeatherApiClient>(ConfigureHttpClient);
 builder.Services.AddHttpClient<SimulatorApiClient>(ConfigureHttpClient);
+
+builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();
 
@@ -36,7 +39,9 @@ app.UseAntiforgery();
 app.UseOutputCache();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode()
+    .AddInteractiveWebAssemblyRenderMode()
+    .AddAdditionalAssemblies(typeof(WebAssemblyComponents.Client._Imports).Assembly);
 
 app.MapDefaultEndpoints();
 
