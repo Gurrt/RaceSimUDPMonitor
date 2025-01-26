@@ -33,6 +33,11 @@ namespace TelemetryApi.Data.Models
         [Required]
         public DateTime StartedAt { get; set; }
 
+        [Required]
+        public bool Active { get; set; }
+
         public DateTime EndedAt { get; set; }
+
+        public ICollection<Lap> Laps { get; }
     }
 }

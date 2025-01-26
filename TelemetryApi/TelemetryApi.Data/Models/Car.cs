@@ -20,5 +20,7 @@ namespace TelemetryApi.Data.Models
 
         [Required]
         public CarClass Class { get; set; } = null!;
+
+        public ICollection<Session> Sessions { get; }
     }
 }

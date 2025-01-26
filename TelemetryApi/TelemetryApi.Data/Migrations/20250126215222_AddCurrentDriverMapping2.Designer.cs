@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TelemetryApi.Data.Contexts;
@@ -11,9 +12,11 @@ using TelemetryApi.Data.Contexts;
 namespace TelemetryApi.Data.Migrations
 {
     [DbContext(typeof(RacesimDbContext))]
-    partial class RacesimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250126215222_AddCurrentDriverMapping2")]
+    partial class AddCurrentDriverMapping2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

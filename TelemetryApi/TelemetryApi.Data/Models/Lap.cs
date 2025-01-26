@@ -24,16 +24,16 @@ namespace TelemetryApi.Data.Models
         public int Number { get; set; }
 
         [Required]
-        public double TotalTime { get; set; }
+        public float TotalTime { get; set; }
 
         [Required]
-        public double Sector1Time { get; set; }
+        public float Sector1Time { get; set; }
 
         [Required]
-        public double Sector2Time { get; set; }
+        public float Sector2Time { get; set; }
 
         [Required]
-        public double Sector3Time { get; set; }
+        public float Sector3Time { get; set; }
 
         [Required]
         public bool Valid { get; set; } = true;

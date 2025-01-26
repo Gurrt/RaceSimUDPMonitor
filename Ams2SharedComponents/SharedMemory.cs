@@ -345,9 +345,9 @@ namespace Ams2SharedComponents
 
         // Vehicle information
         [MessagePack.Key(12)]
-        char[] mCarName = new char[SharedMemoryConsts.STRING_LENGTH_MAX];                 // [ string ]
+        public char[] mCarName = new char[SharedMemoryConsts.STRING_LENGTH_MAX];                 // [ string ]
         [MessagePack.Key(13)]
-        char[] mCarClassName= new char[SharedMemoryConsts.STRING_LENGTH_MAX];            // [ string ]
+        public char[] mCarClassName= new char[SharedMemoryConsts.STRING_LENGTH_MAX];            // [ string ]
 
         // Event information
         [MessagePack.Key(14)]

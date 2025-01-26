@@ -18,4 +18,7 @@ builder.AddProject<Projects.TelemetryApi_Web>("webfrontend")
     .WithExternalHttpEndpoints()
     .WithReference(apiService);
 
+builder.AddProject<Projects.TelemetryApi_DbMigrationService>("telemetryapi-dbmigrationservice")
+    .WithReference(postgresdb);
+
 builder.Build().Run();

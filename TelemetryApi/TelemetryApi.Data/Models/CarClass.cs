@@ -16,5 +16,7 @@ namespace TelemetryApi.Data.Models
 
         [Required]
         public string Name { get; set; } = string.Empty;
+
+        public ICollection<Car> Cars { get; }
     }
 }

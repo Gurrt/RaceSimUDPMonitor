@@ -2,7 +2,10 @@ using Ams2SharedComponents;
 using MessagePack;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using TelemetryApi.ApiService.Hubs;
+using TelemetryApi.ApiService.Interfaces;
+using TelemetryApi.ApiService.Services;
 using TelemetryApi.Data.Contexts;
 using TelemetryApi.Data.DTO;
 using TelemetryApi.Data.Models;
@@ -27,8 +30,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddScoped<ISimulatorSessionTrackingService, SimulatorSessionTrackingService>();
+
 var app = builder.Build();
-int cntr = 0;
 List<SharedMemory> allMemories = new List<SharedMemory>();
 
 // Configure the HTTP request pipeline.
@@ -38,8 +42,6 @@ var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
-
-float lastKnownLaptime = float.MaxValue;
 
 app.MapGet("/weatherforecast", () =>
 {
@@ -54,27 +56,14 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 });
 
-app.MapPost("/telemetry", async([FromBody]Stream data, IHubContext<RealtimeTelemetryHub> hub) =>
+app.MapPost("/telemetry", async(
+    [FromBody]Stream data,
+    [FromHeader(Name="Simulator-Id")] string simulatorId,
+    IHubContext<RealtimeTelemetryHub> hub,
+    ISimulatorSessionTrackingService sessionTrackingService) =>
 {
     SharedMemory rcd = await MessagePackSerializer.DeserializeAsync<SharedMemory>(data);
-    allMemories.Add(rcd);
-    if (rcd.mLastLapTime != lastKnownLaptime)
-    {
-        lastKnownLaptime = rcd.mLastLapTime;
-        int minutes = (int) Math.Floor(lastKnownLaptime / 60);
-        int seconds = (int)Math.Floor(lastKnownLaptime % 60);
-        int miliseconds = (int)(1000 * (lastKnownLaptime - Math.Floor(lastKnownLaptime)));
-
-        string secondsString = seconds < 10 ? "0" + seconds : seconds.ToString();
-        string milisecondsString = miliseconds < 10 ? "00" + miliseconds :
-            miliseconds < 100 ? "0" + miliseconds :
-            miliseconds.ToString();
-
-        string laptimeString = $"{minutes}:{secondsString}.{milisecondsString}";
-        string loggingString = $"New lap from driver: {laptimeString}";
-        Console.WriteLine(loggingString);
-        hub.Clients.All.SendAsync("ReceiveMessage", "Race Control", loggingString);
-    }
+    sessionTrackingService.IngestTelemetry(rcd, simulatorId);
 });
 
 app.MapGet("/simulators", (RacesimDbContext context) =>

@@ -1,6 +1,6 @@
 [
   {
-    "Name": "New Profile",
+    "Name": "Start All",
     "Projects": [
       {
         "Path": "Ams2SharedMemoryWatcher\\Ams2SharedMemoryWatcher.csproj",

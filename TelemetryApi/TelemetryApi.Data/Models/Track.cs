@@ -17,5 +17,7 @@ namespace TelemetryApi.Data.Models
 
         [Required]
         public string Variation { get; set; }
+
+        public ICollection<Session> Sessions { get; }
     }
 }

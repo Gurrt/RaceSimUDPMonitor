@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TelemetryApi.Data.Contexts;
@@ -11,9 +12,11 @@ using TelemetryApi.Data.Contexts;
 namespace TelemetryApi.Data.Migrations
 {
     [DbContext(typeof(RacesimDbContext))]
-    partial class RacesimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250126211934_AddLaptimeTracking")]
+    partial class AddLaptimeTracking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,7 +87,7 @@ namespace TelemetryApi.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Drivers");
+                    b.ToTable("Driver");
                 });
 
             modelBuilder.Entity("TelemetryApi.Data.Models.Lap", b =>
@@ -272,7 +275,7 @@ namespace TelemetryApi.Data.Migrations
             modelBuilder.Entity("TelemetryApi.Data.Models.Simulator", b =>
                 {
                     b.HasOne("TelemetryApi.Data.Models.Driver", "CurrentDriver")
-                        .WithMany()
+                        .WithMany("Simulators")
                         .HasForeignKey("CurrentDriverId");
 
                     b.Navigation("CurrentDriver");
@@ -291,6 +294,8 @@ namespace TelemetryApi.Data.Migrations
             modelBuilder.Entity("TelemetryApi.Data.Models.Driver", b =>
                 {
                     b.Navigation("Sessions");
+
+                    b.Navigation("Simulators");
                 });
 
             modelBuilder.Entity("TelemetryApi.Data.Models.Session", b =>
