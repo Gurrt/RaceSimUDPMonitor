@@ -21,6 +21,10 @@ namespace TelemetryApi.ApiService.Services
         private static readonly Dictionary<string, Session> sessionPerSim = [];
 
         private static readonly Dictionary<Session, float> lastLaptimePerSession = [];
+        private static readonly Dictionary<Session, float> sector1TimesPerSession = [];
+        private static readonly Dictionary<Session, float> sector2TimesPerSession = [];
+        private static readonly Dictionary<Session, float> sector3TimesPerSession = [];
+
         private static readonly Dictionary<Session, bool> nextLapInvalidated = [];
         private static readonly Dictionary<Session, int> lapCounter = [];
 
@@ -46,12 +50,20 @@ namespace TelemetryApi.ApiService.Services
             if (session != default && session != null)
             {
                 sessionPerSim[simulatorId] = session;
+                if (racesimDbContext.Laps.Where(s => s.Session == session).Count() > 0)
+                {
+                    lapCounter[session] = racesimDbContext.Laps.Where(s => s.Session == session).Max(s => s.Number);
+                }
+                else
+                {
+                    lapCounter[session] = 0;
+                }
             }
             
             return session;
         }
 
-        public void IngestTelemetry(SharedMemory sharedMemory, string simulatorId)
+        public async Task IngestTelemetry(SharedMemory sharedMemory, string simulatorId)
         {
             DateTime now = DateTime.UtcNow;
             if (!SimulatorIdIsValid(simulatorId, now))
@@ -63,21 +75,40 @@ namespace TelemetryApi.ApiService.Services
             Session? session = GetSession(simulatorId);
             if (session == default || session == null)
             {
-                session = CreateSessionForTelemetry(sharedMemory, simulatorId, now);
+                session = await CreateSessionForTelemetry(sharedMemory, simulatorId, now);
             }
-            CheckLaptime(session, sharedMemory, now);
+            await CheckLaptime(session, sharedMemory, now);
         }
 
-        private void CheckLaptime(Session session, SharedMemory memory, DateTime now)
+        private async Task CheckLaptime(Session session, SharedMemory memory, DateTime now)
         {
             if (memory.mLapInvalidated)
             {
                 nextLapInvalidated[session] = true;
             }
 
+            // TODO: Don't have to check this on every single packet.
+            if (memory.mCurrentTime > memory.mCurrentSector1Time && (!sector1TimesPerSession.TryGetValue(session, out float sec1Time) ||
+                sec1Time != memory.mCurrentSector1Time))
+            {
+                sector1TimesPerSession[session] = memory.mCurrentSector1Time;
+            } 
+            if (memory.mCurrentTime > memory.mCurrentSector2Time && (!sector2TimesPerSession.TryGetValue(session, out float sec2Time) ||
+                sec2Time != memory.mCurrentSector2Time))
+            {
+                sector2TimesPerSession[session] = memory.mCurrentSector2Time;
+            }
+
+            bool startedInMiddleOfLap = !sector1TimesPerSession.ContainsKey(session) || !sector2TimesPerSession.ContainsKey(session);
             // Different Laptime, passed start.
             if (memory.mLastLapTime > 0 && (!lastLaptimePerSession.TryGetValue(session, out float val) || val != memory.mLastLapTime))
             {
+                if (startedInMiddleOfLap)
+                {
+                    lastLaptimePerSession[session] = memory.mLastLapTime;
+                    return;
+                }
+                sector3TimesPerSession[session] = memory.mCurrentSector3Time;
                 int counter;
                 if (lapCounter.TryGetValue(session, out counter))
                 {
@@ -88,41 +119,50 @@ namespace TelemetryApi.ApiService.Services
                 }
                 lapCounter[session] = counter;
 
-                Lap lap = new()
+                try
                 {
-                    CompletedAt = now,
-                    Valid = nextLapInvalidated.ContainsKey(session) && nextLapInvalidated[session],
-                    Number = counter,
-                    Session = session,
-                    TotalTime = memory.mLastLapTime,
-                    Sector1Time = memory.mCurrentSector1Time,
-                    Sector2Time = memory.mCurrentSector2Time,
-                    Sector3Time = memory.mCurrentSector3Time,
-                };
 
-                racesimDbContext.Add(lap);
-                nextLapInvalidated[session] = false;
+                    Lap lap = new()
+                    {
+                        CompletedAt = now,
+                        Valid = !(nextLapInvalidated.ContainsKey(session) && nextLapInvalidated[session]),
+                        Number = counter,
+                        SessionId = session.Id,
+                        TotalTime = memory.mLastLapTime,
+                        Sector1Time = sector1TimesPerSession[session],
+                        Sector2Time = sector2TimesPerSession[session],
+                        Sector3Time = sector3TimesPerSession[session],
+                    };
 
-                float lastKnownLaptime = memory.mLastLapTime;
-                int minutes = (int)Math.Floor(lastKnownLaptime / 60);
-                int seconds = (int)Math.Floor(lastKnownLaptime % 60);
-                int miliseconds = (int)(1000 * (lastKnownLaptime - Math.Floor(lastKnownLaptime)));
+                    racesimDbContext.Add(lap);
+                    await racesimDbContext.SaveChangesAsync();
+                    nextLapInvalidated[session] = false;
 
-                string secondsString = seconds < 10 ? "0" + seconds : seconds.ToString();
-                string milisecondsString = miliseconds < 10 ? "00" + miliseconds :
-                    miliseconds < 100 ? "0" + miliseconds :
-                    miliseconds.ToString();
+                    float lastKnownLaptime = memory.mLastLapTime;
+                    int minutes = (int)Math.Floor(lastKnownLaptime / 60);
+                    int seconds = (int)Math.Floor(lastKnownLaptime % 60);
+                    int miliseconds = (int)(1000 * (lastKnownLaptime - Math.Floor(lastKnownLaptime)));
 
-                string laptimeString = $"{minutes}:{secondsString}.{milisecondsString}";
-                string loggingString = $"New lap from driver: {laptimeString}";
-                Console.WriteLine(loggingString);
+                    string secondsString = seconds < 10 ? "0" + seconds : seconds.ToString();
+                    string milisecondsString = miliseconds < 10 ? "00" + miliseconds :
+                        miliseconds < 100 ? "0" + miliseconds :
+                        miliseconds.ToString();
 
-                hub.Clients.All.SendAsync("ReceiveMessage", "Race Control", loggingString);
-                lastLaptimePerSession[session] = lastKnownLaptime;
+                    string laptimeString = $"{minutes}:{secondsString}.{milisecondsString}";
+                    string loggingString = $"New lap from driver: {laptimeString}";
+                    Console.WriteLine(loggingString);
+
+                    hub.Clients.All.SendAsync("ReceiveMessage", "Race Control", loggingString);
+                    lastLaptimePerSession[session] = lastKnownLaptime;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
             }
         }
 
-        private Session CreateSessionForTelemetry(SharedMemory sharedMemory, string simulatorId, DateTime now)
+        private async Task<Session> CreateSessionForTelemetry(SharedMemory sharedMemory, string simulatorId, DateTime now)
         {
             Simulator? sim = racesimDbContext.Simulators
                 .Include(s => s.CurrentDriver)
@@ -134,20 +174,22 @@ namespace TelemetryApi.ApiService.Services
             }
 
             Driver driver = sim.CurrentDriver;
-            CarClass cc = GetCreateCarClass(StringFromCharArr(sharedMemory.mCarClassName));
-            Car car = GetCreateCar(StringFromCharArr(sharedMemory.mCarName), cc);
-            Track track = GetCreateTrack(StringFromCharArr(sharedMemory.mTrackLocation), StringFromCharArr(sharedMemory.mTrackVariation));
+            CarClass cc = await GetCreateCarClass(StringFromCharArr(sharedMemory.mCarClassName));
+            Car car = await GetCreateCar(StringFromCharArr(sharedMemory.mCarName), cc);
+            Track track = await GetCreateTrack(StringFromCharArr(sharedMemory.mTranslatedTrackLocation), StringFromCharArr(sharedMemory.mTranslatedTrackVariation));
             Session newSession = new()
             {
                 Active = true,
-                Simulator = sim,
-                Driver = driver,
-                Car = car,
-                Track = track,
+                SimulatorId = sim.Id,
+                DriverId = driver.Id,
+                CarId = car.Id,
+                TrackId = track.Id,
                 StartedAt = now,
             };
 
             racesimDbContext.Add(newSession);
+            await racesimDbContext.SaveChangesAsync();
+
             sessionPerSim[simulatorId] = newSession;
             return newSession;
         }
@@ -166,7 +208,7 @@ namespace TelemetryApi.ApiService.Services
             return builder.ToString();
         }
 
-        private Track GetCreateTrack(string location, string variation)
+        private async Task<Track> GetCreateTrack(string location, string variation)
         {
             Track? track = racesimDbContext.Tracks.Where(s => s.Location == location && s.Variation == variation).FirstOrDefault();
             if (track == default)
@@ -177,11 +219,12 @@ namespace TelemetryApi.ApiService.Services
                     Variation = variation,
                 };
                 racesimDbContext.Add(track);
+                await racesimDbContext.SaveChangesAsync();
             }
             return track;
         }
 
-        private CarClass GetCreateCarClass(string carClass)
+        private async Task<CarClass> GetCreateCarClass(string carClass)
         {
             CarClass? carClassEntity = racesimDbContext.CarsClasses.Where(cc => cc.Name == carClass).FirstOrDefault();
             if (carClassEntity == default)
@@ -191,21 +234,23 @@ namespace TelemetryApi.ApiService.Services
                     Name = carClass,
                 };
                 racesimDbContext.Add(carClassEntity);
+                await racesimDbContext.SaveChangesAsync();
             }
             return carClassEntity;
         }
 
-        private Car GetCreateCar(string car, CarClass carClass)
+        private async Task<Car> GetCreateCar(string car, CarClass carClass)
         {
-            Car carEntity = racesimDbContext.Cars.Where(c => c.Name == car && c.Class == carClass).FirstOrDefault();
+            Car carEntity = racesimDbContext.Cars.Where(c => c.Name == car && c.CarClass == carClass).FirstOrDefault();
             if (carEntity == default)
             {
                 carEntity = new Car()
                 {
-                    Class = carClass,
+                    CarClassId = carClass.Id,
                     Name = car,
                 };
                 racesimDbContext.Add(carEntity);
+                await racesimDbContext.SaveChangesAsync();
             }
             return carEntity;
         }

@@ -63,7 +63,7 @@ app.MapPost("/telemetry", async(
     ISimulatorSessionTrackingService sessionTrackingService) =>
 {
     SharedMemory rcd = await MessagePackSerializer.DeserializeAsync<SharedMemory>(data);
-    sessionTrackingService.IngestTelemetry(rcd, simulatorId);
+    await sessionTrackingService.IngestTelemetry(rcd, simulatorId);
 });
 
 app.MapGet("/simulators", (RacesimDbContext context) =>

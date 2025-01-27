@@ -12,8 +12,8 @@ using TelemetryApi.Data.Contexts;
 namespace TelemetryApi.Data.Migrations
 {
     [DbContext(typeof(RacesimDbContext))]
-    [Migration("20250126215222_AddCurrentDriverMapping2")]
-    partial class AddCurrentDriverMapping2
+    [Migration("20250127193053_InitialCreation")]
+    partial class InitialCreation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,7 +33,7 @@ namespace TelemetryApi.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ClassId")
+                    b.Property<int>("CarClassId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
@@ -42,7 +42,7 @@ namespace TelemetryApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClassId");
+                    b.HasIndex("CarClassId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -146,7 +146,7 @@ namespace TelemetryApi.Data.Migrations
                     b.Property<int>("DriverId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("EndedAt")
+                    b.Property<DateTime?>("EndedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SimulatorId")
@@ -217,19 +217,19 @@ namespace TelemetryApi.Data.Migrations
 
             modelBuilder.Entity("TelemetryApi.Data.Models.Car", b =>
                 {
-                    b.HasOne("TelemetryApi.Data.Models.CarClass", "Class")
-                        .WithMany("Cars")
-                        .HasForeignKey("ClassId")
+                    b.HasOne("TelemetryApi.Data.Models.CarClass", "CarClass")
+                        .WithMany()
+                        .HasForeignKey("CarClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Class");
+                    b.Navigation("CarClass");
                 });
 
             modelBuilder.Entity("TelemetryApi.Data.Models.Lap", b =>
                 {
                     b.HasOne("TelemetryApi.Data.Models.Session", "Session")
-                        .WithMany("Laps")
+                        .WithMany()
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -240,25 +240,25 @@ namespace TelemetryApi.Data.Migrations
             modelBuilder.Entity("TelemetryApi.Data.Models.Session", b =>
                 {
                     b.HasOne("TelemetryApi.Data.Models.Car", "Car")
-                        .WithMany("Sessions")
+                        .WithMany()
                         .HasForeignKey("CarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TelemetryApi.Data.Models.Driver", "Driver")
-                        .WithMany("Sessions")
+                        .WithMany()
                         .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TelemetryApi.Data.Models.Simulator", "Simulator")
-                        .WithMany("Sessions")
+                        .WithMany()
                         .HasForeignKey("SimulatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TelemetryApi.Data.Models.Track", "Track")
-                        .WithMany("Sessions")
+                        .WithMany()
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -279,36 +279,6 @@ namespace TelemetryApi.Data.Migrations
                         .HasForeignKey("CurrentDriverId");
 
                     b.Navigation("CurrentDriver");
-                });
-
-            modelBuilder.Entity("TelemetryApi.Data.Models.Car", b =>
-                {
-                    b.Navigation("Sessions");
-                });
-
-            modelBuilder.Entity("TelemetryApi.Data.Models.CarClass", b =>
-                {
-                    b.Navigation("Cars");
-                });
-
-            modelBuilder.Entity("TelemetryApi.Data.Models.Driver", b =>
-                {
-                    b.Navigation("Sessions");
-                });
-
-            modelBuilder.Entity("TelemetryApi.Data.Models.Session", b =>
-                {
-                    b.Navigation("Laps");
-                });
-
-            modelBuilder.Entity("TelemetryApi.Data.Models.Simulator", b =>
-                {
-                    b.Navigation("Sessions");
-                });
-
-            modelBuilder.Entity("TelemetryApi.Data.Models.Track", b =>
-                {
-                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }

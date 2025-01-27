@@ -11,8 +11,7 @@ namespace TelemetryApi.Data.Models
 
         public long NumSessions { get; set; } = 0;
 
+        public int? CurrentDriverId { get; set; }
         public Driver? CurrentDriver { get; set; }
-
-        public ICollection<Session> Sessions { get; }
     }
 }

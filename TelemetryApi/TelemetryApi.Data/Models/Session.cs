@@ -9,35 +9,20 @@ using System.Xml.Linq;
 
 namespace TelemetryApi.Data.Models
 {
-    [Index(nameof(Driver), IsUnique = false)]
-    [Index(nameof(Simulator), IsUnique = false)]
-    [Index(nameof(Track), IsUnique = false)]
-    [Index(nameof(Car), IsUnique = false)]
     public class Session
     {
         [Key]
         public int Id { get; set; }
-
-        [Required]
+        public int DriverId { get; set; }
         public Driver Driver { get; set; } = null!;
-
-        [Required]
+        public string SimulatorId { get; set; }
         public Simulator Simulator { get; set; } = null!;
-
-        [Required]
+        public int TrackId { get; set; }
         public Track Track { get; set; } = null!;
-
-        [Required]
+        public int CarId { get; set; }
         public Car Car { get; set; } = null!;
-
-        [Required]
         public DateTime StartedAt { get; set; }
-
-        [Required]
         public bool Active { get; set; }
-
-        public DateTime EndedAt { get; set; }
-
-        public ICollection<Lap> Laps { get; }
+        public DateTime? EndedAt { get; set; }
     }
 }

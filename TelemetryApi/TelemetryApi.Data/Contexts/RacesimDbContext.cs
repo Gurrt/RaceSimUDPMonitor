@@ -17,41 +17,5 @@ namespace TelemetryApi.Data.Contexts
 
 
         }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<CarClass>()
-                .HasMany(e => e.Cars)
-                .WithOne(e => e.Class)
-                .HasPrincipalKey(e => e.Id);
-
-            modelBuilder.Entity<Lap>()
-                .HasOne(e => e.Session)
-                .WithMany(e => e.Laps)
-                .HasPrincipalKey(e => e.Id);
-
-            modelBuilder.Entity<Car>()
-                .HasMany(e => e.Sessions)
-                .WithOne(e => e.Car)
-                .HasPrincipalKey(e => e.Id);
-
-            modelBuilder.Entity<Driver>()
-                .HasMany(e => e.Sessions)
-                .WithOne(e => e.Driver)
-                .HasPrincipalKey(e => e.Id);
-
-            modelBuilder.Entity<Track>()
-                .HasMany(e => e.Sessions)
-                .WithOne(e => e.Track)
-                .HasPrincipalKey(e => e.Id);
-
-
-            modelBuilder.Entity<Simulator>()
-                .HasMany(e => e.Sessions)
-                .WithOne(e => e.Simulator)
-                .HasPrincipalKey(e => e.Id);
-
-            modelBuilder.Entity<Simulator>()
-                .HasOne(e => e.CurrentDriver);
-        }
     }
 }

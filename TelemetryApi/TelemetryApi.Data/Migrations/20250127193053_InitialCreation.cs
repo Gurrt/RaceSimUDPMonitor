@@ -7,22 +7,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TelemetryApi.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddLaptimeTracking : Migration
+    public partial class InitialCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Identifier",
-                table: "Simulators",
-                newName: "Id");
-
-            migrationBuilder.AddColumn<int>(
-                name: "CurrentDriverId",
-                table: "Simulators",
-                type: "integer",
-                nullable: true);
-
             migrationBuilder.CreateTable(
                 name: "CarsClasses",
                 columns: table => new
@@ -37,7 +26,7 @@ namespace TelemetryApi.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Driver",
+                name: "Drivers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -46,7 +35,7 @@ namespace TelemetryApi.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Driver", x => x.Id);
+                    table.PrimaryKey("PK_Drivers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,17 +59,36 @@ namespace TelemetryApi.Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    ClassId = table.Column<int>(type: "integer", nullable: false)
+                    CarClassId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cars", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Cars_CarsClasses_ClassId",
-                        column: x => x.ClassId,
+                        name: "FK_Cars_CarsClasses_CarClassId",
+                        column: x => x.CarClassId,
                         principalTable: "CarsClasses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Simulators",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    FriendlyName = table.Column<string>(type: "text", nullable: false),
+                    NumSessions = table.Column<long>(type: "bigint", nullable: false),
+                    CurrentDriverId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Simulators", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Simulators_Drivers_CurrentDriverId",
+                        column: x => x.CurrentDriverId,
+                        principalTable: "Drivers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -95,7 +103,7 @@ namespace TelemetryApi.Data.Migrations
                     CarId = table.Column<int>(type: "integer", nullable: false),
                     StartedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Active = table.Column<bool>(type: "boolean", nullable: false),
-                    EndedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    EndedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -107,9 +115,9 @@ namespace TelemetryApi.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Sessions_Driver_DriverId",
+                        name: "FK_Sessions_Drivers_DriverId",
                         column: x => x.DriverId,
-                        principalTable: "Driver",
+                        principalTable: "Drivers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -153,14 +161,9 @@ namespace TelemetryApi.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Simulators_CurrentDriverId",
-                table: "Simulators",
-                column: "CurrentDriverId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Cars_ClassId",
+                name: "IX_Cars_CarClassId",
                 table: "Cars",
-                column: "ClassId");
+                column: "CarClassId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cars_Name",
@@ -175,8 +178,8 @@ namespace TelemetryApi.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Driver_Name",
-                table: "Driver",
+                name: "IX_Drivers_Name",
+                table: "Drivers",
                 column: "Name",
                 unique: true);
 
@@ -205,21 +208,15 @@ namespace TelemetryApi.Data.Migrations
                 table: "Sessions",
                 column: "TrackId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Simulators_Driver_CurrentDriverId",
+            migrationBuilder.CreateIndex(
+                name: "IX_Simulators_CurrentDriverId",
                 table: "Simulators",
-                column: "CurrentDriverId",
-                principalTable: "Driver",
-                principalColumn: "Id");
+                column: "CurrentDriverId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Simulators_Driver_CurrentDriverId",
-                table: "Simulators");
-
             migrationBuilder.DropTable(
                 name: "Laps");
 
@@ -230,7 +227,7 @@ namespace TelemetryApi.Data.Migrations
                 name: "Cars");
 
             migrationBuilder.DropTable(
-                name: "Driver");
+                name: "Simulators");
 
             migrationBuilder.DropTable(
                 name: "Tracks");
@@ -238,18 +235,8 @@ namespace TelemetryApi.Data.Migrations
             migrationBuilder.DropTable(
                 name: "CarsClasses");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Simulators_CurrentDriverId",
-                table: "Simulators");
-
-            migrationBuilder.DropColumn(
-                name: "CurrentDriverId",
-                table: "Simulators");
-
-            migrationBuilder.RenameColumn(
-                name: "Id",
-                table: "Simulators",
-                newName: "Identifier");
+            migrationBuilder.DropTable(
+                name: "Drivers");
         }
     }
 }

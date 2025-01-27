@@ -5,7 +5,7 @@ namespace TelemetryApi.ApiService.Interfaces
 {
     public interface ISimulatorSessionTrackingService
     {
-        void IngestTelemetry(SharedMemory sharedMemory, string simulatorId);
+        Task IngestTelemetry(SharedMemory sharedMemory, string simulatorId);
 
         Session? GetSession(string simulatorId);
     }
