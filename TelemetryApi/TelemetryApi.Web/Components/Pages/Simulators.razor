@@ -19,6 +19,7 @@ else
             <tr>
                 <th>Name</th>
                 <th>Sessions</th>
+                <th>Driver</th>
                 <th>Active</th>
             </tr>
         </thead>
@@ -28,6 +29,7 @@ else
                 <tr>
                     <td>@sim.FriendlyName</td>
                     <td>@sim.NumSessions</td>
+                    <td>@sim.DriverName</td>
                     <td>@sim.Connected</td>
                 </tr>
             }
@@ -36,7 +38,8 @@ else
 }
 
 @code {
-    private SimulatorDTO[]? simulators;
+    private Simulator[]? simulators;
+    private DriverDTO[]? allDrivers;
 
     protected override async Task OnInitializedAsync()
     {

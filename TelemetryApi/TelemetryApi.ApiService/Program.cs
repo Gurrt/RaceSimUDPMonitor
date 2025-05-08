@@ -25,8 +25,10 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("*");
-        policy.WithHeaders(["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Signalr-User-Agent"]);
+        policy.WithOrigins("*")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .WithExposedHeaders("Content-Disposition");
     });
 });
 
@@ -68,7 +70,90 @@ app.MapPost("/telemetry", async(
 
 app.MapGet("/simulators", (RacesimDbContext context) =>
 {
-    return context.Simulators.Select(sim => new SimulatorDTO(sim.FriendlyName, sim.NumSessions, false)).ToArray();
+    return context.Simulators.Select(sim => new SimulatorDTO(sim.FriendlyName, sim.NumSessions, sim.CurrentDriverId, false)).ToArray();
+});
+
+app.MapGet("/drivers", async (RacesimDbContext context) =>
+{
+    var drivers = await context.Drivers.ToListAsync();
+    return drivers.Select(DriverDTO.FromModel);
+});
+
+app.MapGet("/drivers/{id}", async (int id, RacesimDbContext context) =>
+{
+    var driver = await context.Drivers.FindAsync(id);
+    if (driver == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(DriverDTO.FromModel(driver));
+});
+
+app.MapPost("/drivers", async ([FromBody] DriverDTO driverDto, RacesimDbContext context) =>
+{
+    var driver = new Driver { Name = driverDto.Name };
+    context.Drivers.Add(driver);
+    try
+    {
+        await context.SaveChangesAsync();
+        return Results.Created($"/drivers/{driver.Id}", DriverDTO.FromModel(driver));
+    }
+    catch (DbUpdateException)
+    {
+        return Results.Conflict("A driver with this name already exists.");
+    }
+});
+
+app.MapPut("/drivers/{id}", async (int id, [FromBody] DriverDTO driverDto, RacesimDbContext context) =>
+{
+    var driver = await context.Drivers.FindAsync(id);
+    if (driver == null)
+    {
+        return Results.NotFound();
+    }
+
+    driver.Name = driverDto.Name;
+    try
+    {
+        await context.SaveChangesAsync();
+        return Results.Ok(DriverDTO.FromModel(driver));
+    }
+    catch (DbUpdateException)
+    {
+        return Results.Conflict("A driver with this name already exists.");
+    }
+});
+
+app.MapDelete("/drivers/{id}", async (int id, RacesimDbContext context) =>
+{
+    var driver = await context.Drivers.FindAsync(id);
+    if (driver == null)
+    {
+        return Results.NotFound();
+    }
+
+    context.Drivers.Remove(driver);
+    await context.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+app.MapPost("/simulators/{simulatorId}/driver/{driverId}", async (string simulatorId, int driverId, RacesimDbContext context) =>
+{
+    var simulator = await context.Simulators.FindAsync(simulatorId);
+    if (simulator == null)
+    {
+        return Results.NotFound("Simulator not found");
+    }
+
+    var driver = await context.Drivers.FindAsync(driverId);
+    if (driver == null)
+    {
+        return Results.NotFound("Driver not found");
+    }
+
+    simulator.CurrentDriverId = driverId;
+    await context.SaveChangesAsync();
+    return Results.Ok(new SimulatorDTO(simulator.FriendlyName, simulator.NumSessions, simulator.CurrentDriverId, false));
 });
 
 app.MapHub<RealtimeTelemetryHub>("/realtimeTelemetryHub");

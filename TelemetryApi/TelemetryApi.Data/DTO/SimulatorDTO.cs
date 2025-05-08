@@ -7,7 +7,7 @@ using TelemetryApi.Data.Models;
 
 namespace TelemetryApi.Data.DTO
 {
-    public record SimulatorDTO(string FriendlyName, long NumSessions, bool Connected)
+    public record SimulatorDTO(string FriendlyName, long NumSessions, int? DriverId, bool Connected)
     {
     }
 }

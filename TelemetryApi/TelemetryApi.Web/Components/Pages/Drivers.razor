@@ -1,0 +1,123 @@
+@page "/drivers"
+@attribute [StreamRendering(true)]
+@using System.ComponentModel.DataAnnotations
+
+@inject DriverApiClient DriverApi
+@inject NavigationManager NavigationManager
+
+<PageTitle>Drivers</PageTitle>
+
+<div class="container">
+    <h1>Drivers</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Add New Driver</h5>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="newDriver" OnValidSubmit="HandleValidSubmit" FormName="NewDriverForm">
+                        <DataAnnotationsValidator />
+                        <div class="form-group mb-3">
+                            <label for="driverName" class="form-label">Driver Name</label>
+                            <InputText id="driverName" @bind-Value="newDriver.Name" class="form-control" />
+                            <ValidationMessage For="@(() => newDriver.Name)" class="text-danger" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Driver</button>
+                    </EditForm>
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-3">
+                            @errorMessage
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Current Drivers</h5>
+                </div>
+                <div class="card-body">
+                    @if (drivers == null)
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                    else if (drivers.Count == 0)
+                    {
+                        <p>No drivers found. Add your first driver using the form.</p>
+                    }
+                    else
+                    {
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var driver in drivers)
+                                {
+                                    <tr>
+                                        <td>@driver.Id</td>
+                                        <td>@driver.Name</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<DriverDTO>? drivers;
+    [SupplyParameterFromForm]
+    private NewDriverModel? newDriver { get; set; }
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (newDriver == null) {
+            newDriver = new();
+        }
+        await LoadDrivers();
+    }
+
+    private async Task LoadDrivers()
+    {
+        drivers = await DriverApi.GetDriversAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        errorMessage = null;
+        var result = await DriverApi.AddDriverAsync(newDriver.Name);
+        
+        if (result != null)
+        {
+            newDriver = new NewDriverModel();
+            await LoadDrivers();
+        }
+        else
+        {
+            errorMessage = "Failed to add driver. The name might already exist.";
+        }
+    }
+
+    public class NewDriverModel
+    {
+        [Required(ErrorMessage = "Driver name is required")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 100 characters")]
+        public string Name { get; set; } = string.Empty;
+    }
+} 

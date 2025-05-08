@@ -19,6 +19,7 @@ builder.Services.AddOutputCache();
 
 builder.Services.AddHttpClient<WeatherApiClient>(ConfigureHttpClient);
 builder.Services.AddHttpClient<SimulatorApiClient>(ConfigureHttpClient);
+builder.Services.AddHttpClient<DriverApiClient>(ConfigureHttpClient);
 
 builder.WebHost.UseStaticWebAssets();
 
